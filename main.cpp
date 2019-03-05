@@ -203,11 +203,10 @@ int main(int argc, char** argv)
   glDepthFunc(GL_LESS);
 
   fps* tfps = new fps();
-  glfwSwapInterval(1);
   while (!glfwWindowShouldClose(window)) {
     tfps->frame();
 
-    if ( tfps->passedT > 1) {
+    if (tfps->passedT > 1) {
       std::cout << "FPS: " << 1.0/tfps->dt << std::endl;
       tfps->resetTimer();
     }
@@ -249,6 +248,7 @@ int main(int argc, char** argv)
 
   delete cube;
   delete standard;
+  delete tfps;
 
   glfwTerminate();
   return 0;
