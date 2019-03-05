@@ -102,7 +102,6 @@ int main(int argc, char** argv)
 
   std::cout << glGetString(GL_VERSION) << std::endl;
 
-  fps tfps(glfwGetTime());
 
   float positions[] = {
     -1.0f, -1.0f, -1.0f,  1.0f, //0
@@ -203,10 +202,15 @@ int main(int argc, char** argv)
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
+  fps* tfps = new fps();
+  glfwSwapInterval(1);
   while (!glfwWindowShouldClose(window)) {
-    tfps.countFrame();
-    if ( tfps.getCurrentDT(glfwGetTime()) > 0.5)
-      std::cout << "FPS: " << tfps.getFPS((double)glfwGetTime()) << std::endl;
+    tfps->frame();
+
+    if ( tfps->passedT > 1) {
+      std::cout << "FPS: " << 1.0/tfps->dt << std::endl;
+      tfps->resetTimer();
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -214,7 +218,6 @@ int main(int argc, char** argv)
     standard->setUniform3f("u_Color", (1.0f+(float)sin(alpha))/2.0f, 1.0f, 1.0f);
     circlePoint->bind();
     circlePoint->setUniform3f("u_Color", (1.0f+(float)sin(alpha))/2.0f, 1.0f, 1.0f);
-    angle += glm::radians(0.02f);
 
     glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, -1.0f, 0.0f));
     glm::mat4 M3D = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scalingMatrix;
@@ -237,7 +240,8 @@ int main(int argc, char** argv)
     glPointSize(10.0f);
     cube->draw(GL_POINTS, 16, 32 * 2);
 
-    alpha += 0.0002f;
+    angle += glm::radians(45.0 * tfps->dt);
+    alpha += 0.5 * tfps->dt;
 
     glfwSwapBuffers(window);
     glfwPollEvents();
